@@ -1,252 +1,944 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Viewport for all devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Media Recommendation System Machine Learning Projects</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>Media Recommendation Systems | Karan Veer Singh</title>
+
+  <meta
+    name="description"
+    content="Explore two machine learning projects by Karan Veer Singh: a content-based movie recommendation system using TF-IDF and cosine similarity, and a music recommendation system using popularity ranking and collaborative item similarity."
+  >
+  <meta name="theme-color" content="#101116">
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
+    :root {
+      color-scheme: dark;
+
+      --background: #101116;
+      --text: #f5f5f7;
+      --muted: #c2c4ce;
+      --subtle: #9699a7;
+      --accent: #d5d8e5;
+      --glass: rgba(24, 26, 36, 0.63);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-hover: rgba(255, 255, 255, 0.09);
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.28);
+
+      --page-width: 900px;
+      --page-gutter: clamp(18px, 5vw, 64px);
+    }
+
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
     }
 
+    html {
+      min-height: 100%;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: url('assets/bg.jpg') center center / cover no-repeat fixed;
-      color: white;
-      text-align: center;
+      min-width: 0;
       min-height: 100vh;
+      min-height: 100svh;
+      margin: 0;
+      padding:
+        max(26px, env(safe-area-inset-top))
+        var(--page-gutter)
+        max(24px, env(safe-area-inset-bottom));
+
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
       align-items: center;
-      position: relative;
-      overflow-x: hidden;
-      padding: 0 80px;
+
+      overflow-x: clip;
+
+      background: var(--background);
+      color: var(--text);
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     body::before {
       content: "";
       position: fixed;
+      inset: -24px;
+      z-index: -2;
+      pointer-events: none;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(8, 9, 14, 0.53) 0%,
+          rgba(10, 11, 17, 0.69) 48%,
+          rgba(8, 9, 14, 0.82) 100%
+        ),
+        url("assets/bg.jpg") center center / cover no-repeat;
+
+      transform: translateZ(0);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
       inset: 0;
-      background: inherit;
-      filter: blur(20px) brightness(0.55) saturate(1.1);
       z-index: -1;
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          ellipse at 50% 0%,
+          rgba(165, 173, 211, 0.10),
+          transparent 55%
+        );
+    }
+
+    a {
+      color: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 5px;
+      border-radius: 6px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--page-width);
+      margin-inline: auto;
+    }
+
+    .hero {
+      padding: clamp(22px, 5vw, 48px) 0 30px;
+      text-align: center;
+      animation: fade-up 700ms ease both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 650;
+      letter-spacing: 0.19em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.42);
     }
 
     h1 {
-      margin-top: 60px;
-      margin-bottom: 20px;
-      font-size: 2.5rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-      word-break: break-word;
-      hyphens: auto;
+      max-width: 760px;
+      margin: 0 auto;
+
+      font-size: clamp(2rem, 5.5vw, 3.45rem);
+      font-weight: 750;
+      letter-spacing: -0.045em;
+      line-height: 1.13;
+      text-wrap: balance;
+
+      text-shadow: 0 3px 22px rgba(0, 0, 0, 0.4);
     }
 
-    .glass-box {
-      margin: 20px auto;
-      width: 100%;
-      max-width: 800px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 40px;
-      backdrop-filter: blur(15px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      padding: 30px 32px;
-      color: white;
-      text-align: left;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeInUp 0.8s ease forwards;
-      box-sizing: border-box;
+    .hero-description {
+      max-width: 620px;
+      margin: 20px auto 0;
+
+      color: var(--muted);
+      font-size: clamp(0.96rem, 2vw, 1.08rem);
+      line-height: 1.85;
+      text-wrap: pretty;
     }
 
-    .glass-box:nth-of-type(1) {
-      animation-delay: 0.3s;
-    }
-    .glass-box:nth-of-type(2) {
-      animation-delay: 0.6s;
-    }
-    
-    .source-btn {
-      margin-bottom: 30px;
-      padding: 12px 28px;
-      font-size: 1.1rem;
+    .hero-description strong {
+      color: var(--text);
       font-weight: 600;
-      letter-spacing: 1px;
-      border-radius: 30px;
-      background: rgba(255, 255, 255, 0.18);
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      text-decoration: none;
-      display: inline-block;
-      transition: background 0.3s ease, transform 0.2s ease;
     }
 
-    .source-btn:hover {
-      background: rgba(255, 255, 255, 0.25);
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 46px;
+      max-width: 100%;
+      padding: 11px 21px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+
+      background: rgba(255, 255, 255, 0.10);
+      color: var(--text);
+
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+      text-decoration: none;
+
+      transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
+    }
+
+    .button-primary {
+      background: rgba(245, 245, 250, 0.94);
+      color: #171820;
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .button:hover {
+      background: rgba(255, 255, 255, 0.17);
+      border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-2px);
     }
 
+    .button-primary:hover {
+      background: #ffffff;
+      color: #171820;
+    }
+
+    .button svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+
+    .section-heading {
+      margin: 18px 0 15px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+
+      color: var(--subtle);
+      font-size: 0.75rem;
+      font-weight: 650;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .section-heading::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.17);
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      width: 100%;
+    }
+
+    .glass-box {
+      min-width: 0;
+      padding: clamp(22px, 4.5vw, 34px);
+
+      border: 1px solid var(--glass-border);
+      border-radius: clamp(20px, 3vw, 30px);
+
+      background: var(--glass);
+      box-shadow: var(--shadow);
+
+      -webkit-backdrop-filter: blur(18px) saturate(125%);
+      backdrop-filter: blur(18px) saturate(125%);
+
+      animation: fade-up 750ms ease both;
+    }
+
+    .glass-box:nth-child(2) {
+      animation-delay: 120ms;
+    }
+
+    .card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+
+      margin-bottom: 17px;
+    }
+
+    .project-number {
+      color: var(--subtle);
+      font-size: 0.76rem;
+      font-weight: 650;
+      letter-spacing: 0.14em;
+    }
+
+    .project-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 6px 11px;
+
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 999px;
+
+      color: #e0e1ea;
+      background: rgba(255, 255, 255, 0.055);
+
+      font-size: 0.71rem;
+      font-weight: 600;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .project-type::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #c5c9dc;
+      box-shadow: 0 0 9px rgba(197, 201, 220, 0.35);
+    }
+
     h2 {
-      font-size: 1.8rem;
-      margin-bottom: 14px;
-      border-bottom: 2px solid rgba(255,255,255,0.3);
-      padding-bottom: 10px;
-      word-break: break-word;
-      hyphens: auto;
+      margin: 0;
+
+      font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.25;
+      text-wrap: balance;
     }
 
-    p {
+    .project-subtitle {
+      margin: 9px 0 19px;
+
+      color: var(--subtle);
+      font-size: 0.88rem;
+      font-weight: 500;
       line-height: 1.6;
-      font-size: 1.1rem;
-      margin-bottom: 22px;
-      word-break: break-word;
-      hyphens: auto;
     }
 
-    code {
-      display: block;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 14px 18px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      margin-top: 10px;
-      font-family: Consolas, monospace;
-      color: #dbdbdb;
-      box-shadow: inset 0 0 14px rgb(0 0 0 / 0.2);
-      word-break: break-word;
-      hyphens: auto;
-      white-space: pre-wrap;
+    .project-description {
+      margin: 0 0 16px;
+
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+      text-wrap: pretty;
     }
 
-    @keyframes fadeInUp {
+    .project-description strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .methodology {
+      margin: 22px 0 0;
+      padding-top: 19px;
+
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .methodology-label {
+      margin: 0 0 12px;
+
+      color: var(--subtle);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      max-width: 100%;
+      padding: 7px 11px;
+
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9px;
+
+      background: rgba(0, 0, 0, 0.15);
+      color: #e0e1e9;
+
+      font-family: inherit;
+      font-size: 0.79rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      margin-top: 24px;
+    }
+
+    .card-actions .button {
+      min-height: 42px;
+      padding: 10px 16px;
+      font-size: 0.84rem;
+    }
+
+    .page-note {
+      max-width: 660px;
+      margin: 28px auto 0;
+
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      text-align: center;
+      text-wrap: pretty;
+    }
+
+    footer {
+      width: 100%;
+      margin-top: auto;
+      padding-top: 44px;
+
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+
+      min-height: 46px;
+      max-width: 100%;
+      padding: 10px 20px;
+
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+
+      background: rgba(0, 0, 0, 0.20);
+      color: var(--muted);
+
+      font-size: 0.87rem;
+      font-weight: 600;
+      line-height: 1.5;
+      text-align: center;
+      text-decoration: none;
+
+      transition:
+        background-color 180ms ease,
+        color 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
+    }
+
+    .footer-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateY(-2px);
+    }
+
+    .footer-mark {
+      display: inline-grid;
+      width: 25px;
+      height: 25px;
+      flex: 0 0 auto;
+      place-items: center;
+
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      border-radius: 50%;
+
+      color: var(--text);
+      font-size: 0.77rem;
+      font-weight: 750;
+    }
+
+    .footer-caption {
+      margin: 13px 0 0;
+      padding-bottom: 5px;
+
+      color: var(--subtle);
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    @keyframes fade-up {
       from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(16px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    footer {
-      margin-top: auto;
-      margin-bottom: 40px;
-      padding: 0 24px;
-      font-size: 1rem;
-      opacity: 0.9;
-      background: rgba(0,0,0,0.25);
-      color: #c0c0c0;
-      border-radius: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      outline: none;
-      display: inline-block;
-      width: 280px;
-      line-height: 3rem;
-      font-weight: 600;
-      text-decoration: none;
-    }
+    @media (min-width: 760px) {
+      :root {
+        --page-gutter: 36px;
+      }
 
-    footer:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      transform: translateY(-3px);
-    }
-
-    /* MOBILE: Tablets and below */
-    @media (max-width: 768px) {
       body {
-        padding: 0 !important;
+        padding-top: 34px;
+      }
+
+      .hero {
+        padding-top: 32px;
+        padding-bottom: 38px;
+      }
+
+      .projects {
+        gap: 24px;
       }
 
       .glass-box {
-        max-width: 100vw;
-        padding: 18px 6px;
-        border-radius: 16px;
-        margin-left: auto;
-        margin-right: auto;
-        box-sizing: border-box;
+        padding: 34px 38px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --page-gutter: 16px;
+      }
+
+      body {
+        padding-top: max(18px, env(safe-area-inset-top));
+      }
+
+      .hero {
+        padding-top: 23px;
+        padding-bottom: 24px;
+      }
+
+      .eyebrow {
+        gap: 8px;
+        margin-bottom: 15px;
+        font-size: 0.64rem;
+        letter-spacing: 0.13em;
+      }
+
+      .eyebrow::before,
+      .eyebrow::after {
+        width: 15px;
       }
 
       h1 {
-        font-size: 1.7rem;
-        margin-top: 30px;
+        font-size: clamp(1.9rem, 8.3vw, 2.4rem);
+        letter-spacing: -0.04em;
+      }
+
+      .hero-description {
+        margin-top: 15px;
+        font-size: 0.93rem;
+        line-height: 1.8;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .hero-actions .button {
+        width: 100%;
+      }
+
+      .section-heading {
+        margin-top: 14px;
+        font-size: 0.68rem;
+      }
+
+      .projects {
+        gap: 15px;
+      }
+
+      .glass-box {
+        padding: 21px 18px;
+        border-radius: 20px;
+      }
+
+      .card-topline {
+        align-items: flex-start;
         margin-bottom: 15px;
       }
+
+      .project-type {
+        max-width: 72%;
+        white-space: normal;
+        text-align: right;
+      }
+
       h2 {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
+        font-size: 1.48rem;
       }
-      .source-btn, footer {
+
+      .project-subtitle {
+        margin-top: 8px;
+        margin-bottom: 15px;
+        font-size: 0.83rem;
+      }
+
+      .project-description {
+        font-size: 0.92rem;
+        line-height: 1.8;
+      }
+
+      .methodology {
+        margin-top: 19px;
+        padding-top: 16px;
+      }
+
+      .tag {
+        font-size: 0.76rem;
+      }
+
+      .card-actions {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 21px;
+      }
+
+      .card-actions .button {
         width: 100%;
-        max-width: 300px;
+        min-height: 44px;
       }
-      p, code {
-        font-size: 1rem;
-        padding: 0;
+
+      .page-note {
+        margin-top: 22px;
+        font-size: 0.82rem;
+      }
+
+      footer {
+        padding-top: 32px;
+      }
+
+      .footer-link {
+        width: 100%;
+        padding-inline: 14px;
       }
     }
-    /* MOBILE: Phones */
-    @media (max-width: 480px) {
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @supports not (overflow: clip) {
       body {
-        padding: 0 !important;
+        overflow-x: hidden;
       }
-      h1 {
-        font-size: 1.1rem;
-        margin-top: 14px;
-        margin-bottom: 12px;
-      }
-      h2 {
-        font-size: 1rem;
-      }
+    }
+
+    @supports not ((backdrop-filter: blur(1px))) {
       .glass-box {
-        padding: 8px 4px;
-        border-radius: 12px;
-        margin: 10px auto;
-      }
-      p, code {
-        font-size: 0.85rem;
-      }
-      .source-btn, footer {
-        font-size: 0.9rem;
-        padding: 8px 10px;
-        width: 100%;
-        max-width: 220px;
-        line-height: 2.2rem;
+        background: rgba(18, 20, 29, 0.93);
       }
     }
   </style>
 </head>
+
 <body>
-  <h1>Media Recommendation System <br>Machine Learning Projects</h1>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">Machine Learning · Python</p>
 
-  <a href="https://github.com/karanveersingh05/Media-Recemmondation-System" target="_blank" class="source-btn">Source Code and Assets</a>
+      <h1>Media Recommendation Systems</h1>
 
-  <div class="glass-box">
-    <h2>Movie Recommendation System</h2>
-    <p>Inspired by Netflix's content-based recommendation engine, this project suggests Hollywood movies by analyzing their features. It uses a TF-IDF (Term Frequency-Inverse Document Frequency) vectorizer from scikit-learn to convert textual data like genres, keywords, and cast into numerical vectors. Cosine similarity is then calculated between these vectors to find and recommend movies with the most similar content to what a user likes. The entire system is built as a standalone Jupyter Notebook without external modules for simplicity.</p>
-    <code>Key Tools: pandas, numpy, scikit-learn (TfidfVectorizer, cosine_similarity), difflib</code>
-  </div>
+      <p class="hero-description">
+        Exploring how data can make discovery more personal.
+        Two projects exploring different ways to recommend
+        <strong>movies and music</strong>, from content similarity
+        to patterns in listening behaviour.
+      </p>
 
-  <div class="glass-box">
-    <h2>Music Recommendation System</h2>
-    <p>This project mirrors Spotify’s approach to music discovery by using collaborative filtering. It analyzes the listening history of a large user base to find patterns. The core logic is organized into a reusable  module for better code management, containing classes for both a popularity-based model (recommending what's trending) and an item-similarity model (recommending songs liked by similar users). This modular design makes the recommendation engine clean and easy to maintain.</p>
-    <code>Key Tools: pandas, numpy, and a custom Recommenders.py module with : Set Operations, Jaccard Similarity Index, Co-occurrence Matrix, Collaborative Filtering</code>
-  </div>
+      <div class="hero-actions">
+        <a
+          class="button button-primary"
+          href="https://github.com/karanveersingh05/Media-Recemmondation-System"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Explore the source code on GitHub"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 6v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.7a5.2 5.2 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.6s-1.1-.4-3.7 1.4a13 13 0 0 0-6.7 0C5.7 1.1 4.6 1.5 4.6 1.5a4.8 4.8 0 0 0-.1 3.6A5.2 5.2 0 0 0 3.1 8.7c0 5.2 3.1 6.4 6.1 6.7a3.4 3.4 0 0 0-.9 2.7V22"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Explore Source Code
+        </a>
 
-  <a href="https://karanveersingh05.github.io/links.to.me/" target="_blank" style="text-decoration: none;">
-    <footer>Made by Karan Veer Singh</footer>
-  </a>
+        <a class="button" href="#projects">
+          Discover the Projects
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 5v14m-7-7 7 7 7-7"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      </div>
+    </header>
+
+    <section id="projects" aria-labelledby="projects-heading">
+      <div class="section-heading" id="projects-heading">
+        Selected Projects
+      </div>
+
+      <div class="projects">
+        <article class="glass-box">
+          <div class="card-topline">
+            <span class="project-number">PROJECT 01</span>
+            <span class="project-type">Content-Based Filtering</span>
+          </div>
+
+          <h2>Movie Recommendation System</h2>
+
+          <p class="project-subtitle">
+            Finding the next film through metadata similarity.
+          </p>
+
+          <p class="project-description">
+            This project explores <strong>content-based recommendation</strong>
+            using a Hollywood movie dataset. Rather than relying solely on
+            a film's popularity, it represents descriptive movie information
+            as text and compares films according to the features they share.
+          </p>
+
+          <p class="project-description">
+            A <strong>TF-IDF vectorizer</strong> transforms selected metadata,
+            including genres, keywords, cast and crew information, into
+            numerical representations. <strong>Cosine similarity</strong>
+            then measures how closely the resulting feature vectors align.
+            The notebook also uses <strong>difflib</strong> to help match
+            a user's movie title to an available entry.
+          </p>
+
+          <p class="project-description">
+            The result is a ranked set of similar movies based on their
+            metadata, demonstrating how text processing and vector similarity
+            can power a recommendation workflow.
+          </p>
+
+          <div class="methodology">
+            <p class="methodology-label">Methods &amp; Technologies</p>
+
+            <div class="tags" aria-label="Movie project technologies">
+              <span class="tag">Python</span>
+              <span class="tag">Pandas</span>
+              <span class="tag">NumPy</span>
+              <span class="tag">Scikit-learn</span>
+              <span class="tag">TF-IDF</span>
+              <span class="tag">Cosine Similarity</span>
+              <span class="tag">difflib</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <a
+              class="button button-primary"
+              href="https://github.com/karanveersingh05/Media-Recemmondation-System/blob/main/Movie%20Recommendation%20System/Movie_Recommendation_System%20by%20Karan%20Veer%20Singh.ipynb"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Movie Notebook
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M7 17 17 7M8 7h9v9"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+
+            <a
+              class="button"
+              href="https://github.com/karanveersingh05/Media-Recemmondation-System/tree/main/Movie%20Recommendation%20System"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Explore Project Files
+            </a>
+          </div>
+        </article>
+
+        <article class="glass-box">
+          <div class="card-topline">
+            <span class="project-number">PROJECT 02</span>
+            <span class="project-type">Collaborative Item Similarity</span>
+          </div>
+
+          <h2>Music Recommendation System</h2>
+
+          <p class="project-subtitle">
+            Using listening patterns to uncover related songs.
+          </p>
+
+          <p class="project-description">
+            This project explores music discovery through user-song
+            interaction data. The dataset combines listening records with
+            song metadata, making it possible to examine both overall
+            listening popularity and relationships between songs.
+          </p>
+
+          <p class="project-description">
+            A <strong>popularity-based model</strong> ranks songs by their
+            frequency in the listening records. A separate item-similarity
+            model examines the sets of users associated with each song,
+            then uses the <strong>Jaccard similarity index</strong> to
+            quantify overlap between those sets.
+          </p>
+
+          <p class="project-description">
+            The item-similarity workflow builds a co-occurrence-style
+            similarity matrix and aggregates similarity scores to generate
+            ranked recommendations. The core logic lives in a reusable
+            <strong>Recommenders.py</strong> module, separate from the
+            notebook used to load data and run experiments.
+          </p>
+
+          <div class="methodology">
+            <p class="methodology-label">Methods &amp; Technologies</p>
+
+            <div class="tags" aria-label="Music project technologies">
+              <span class="tag">Python</span>
+              <span class="tag">Pandas</span>
+              <span class="tag">NumPy</span>
+              <span class="tag">Popularity Ranking</span>
+              <span class="tag">Jaccard Similarity</span>
+              <span class="tag">Set Operations</span>
+              <span class="tag">Co-occurrence Matrix</span>
+              <span class="tag">Collaborative Filtering</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <a
+              class="button button-primary"
+              href="https://github.com/karanveersingh05/Media-Recemmondation-System/blob/main/Music%20Recommendation%20System/Music%20Recommendation%20System%20By%20Karan%20Veer%20Singh.ipynb"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Music Notebook
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M7 17 17 7M8 7h9v9"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+
+            <a
+              class="button"
+              href="https://github.com/karanveersingh05/Media-Recemmondation-System/tree/main/Music%20Recommendation%20System"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Explore Project Files
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <p class="page-note">
+      Both projects are notebook-based explorations of recommendation
+      techniques. They demonstrate how data representation, similarity
+      measures and ranking can help surface relevant content.
+      The recommendations depend on the available datasets and implemented
+      methods.
+    </p>
+
+    <footer>
+      <div>
+        <a
+          class="footer-link"
+          href="https://karanveersingh05.github.io/links.to.me/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="footer-mark" aria-hidden="true">K.</span>
+          <span>Made by Karan Veer Singh</span>
+          <svg
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M7 17 17 7M8 7h9v9"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+
+        <p class="footer-caption">
+          Built with curiosity, data and code.
+        </p>
+      </div>
+    </footer>
+  </main>
 </body>
 </html>
